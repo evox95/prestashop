@@ -1,0 +1,50 @@
+version: '3'
+
+volumes:
+    psdev-shop-vol:
+    psdev-database-vol:
+
+services:
+    psdev-database:
+        extends:
+            file: docker-common.yml
+            service: psdev-database
+        volumes:
+            - psdev-database-vol:/var/lib/mysql
+    psdev-pma:
+        extends:
+            file: docker-common.yml
+            service: psdev-pma
+        depends_on:
+            - psdev-database
+    psdev-shop:
+        extends:
+            file: docker-common.yml
+            service: psdev-shop
+        volumes:
+            - psdev-shop-vol:/var/www/html
+        depends_on:
+            - psdev-database
+
+x-mutagen:
+    sync:
+        defaults:
+            ignore:
+                vcs: true
+                paths:
+                    - ".idea"
+                    - ".DS_Store"
+        shop-sync:
+            mode: "two-way-resolved"
+            alpha: "./shop"
+            beta: "volume://psdev-shop-vol"
+            configurationBeta:
+                permissions:
+                    defaultOwner: "id:33" # www-data
+                    defaultGroup: "id:33" # www-data
+                    defaultFileMode: 0644
+                    defaultDirectoryMode: 0755
+        database-sync:
+            mode: "two-way-resolved"
+            alpha: "volume://psdev-database-vol"
+            beta: "./database"

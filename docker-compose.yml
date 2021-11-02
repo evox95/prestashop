@@ -1,0 +1,23 @@
+version: '3.7'
+
+services:
+    psdev-database:
+        extends:
+            file: docker-common.yml
+            service: psdev-database
+        volumes:
+            - ./database:/var/lib/mysql:delegated
+    psdev-pma:
+        extends:
+            file: docker-common.yml
+            service: psdev-pma
+        depends_on:
+            - psdev-database
+    psdev-shop:
+        extends:
+            file: docker-common.yml
+            service: psdev-shop
+        volumes:
+            - ./shop:/var/www/html:delegated
+        depends_on:
+            - psdev-database

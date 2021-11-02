@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+    psdev-database:
+        image: mariadb:10
+        restart: on-failure
+        ports:
+            - "3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: root1
+            MYSQL_DATABASE: prestashop
+    psdev-pma:
+        image: phpmyadmin/phpmyadmin:latest
+        restart: on-failure
+        ports:
+            - "8081:80"
+        environment:
+            PMA_HOST: psdev-database
+            UPLOAD_LIMIT: 500M
+    psdev-shop:
+        build: .
+        restart: on-failure
+        environment:
+            PS_DEV_MODE: 1
+        ports:
+            - "80:80"
